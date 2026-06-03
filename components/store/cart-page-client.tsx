@@ -61,6 +61,18 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
   const map = useMemo(() => new Map(products.map((p) => [p._id, p])), [products]);
   const lines = cart.map((item) => ({ ...item, product: map.get(item.productId) })).filter((i) => i.product);
   const total = lines.reduce((sum, line) => sum + line.product!.price * line.quantity, 0);
+  const [cleanupMessage, setCleanupMessage] = useState("");
+
+  useEffect(() => {
+    if (!isHydrated) return;
+    const unavailableItems = cart.filter((item) => !map.has(item.productId));
+    if (unavailableItems.length === 0) return;
+
+    const nextCart = cart.filter((item) => map.has(item.productId));
+    setCart(nextCart);
+    persistCart(nextCart);
+    setCleanupMessage("Some unavailable products were removed from your cart.");
+  }, [cart, isHydrated, map]);
 
   function setQty(productId: string, quantity: number) {
     const nextQty = Math.max(1, Math.min(99, quantity));
@@ -125,6 +137,11 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
           </div>
           <div className="rounded-full bg-zinc-100 px-3 py-1 text-sm text-zinc-700">{lines.length} item{lines.length === 1 ? "" : "s"}</div>
         </div>
+        {cleanupMessage ? (
+          <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+            {cleanupMessage}
+          </div>
+        ) : null}
         <div className="space-y-4">
           {lines.map((line) => (
             <div key={line.productId} className="rounded-3xl border border-zinc-200 bg-zinc-50 p-4">

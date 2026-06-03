@@ -85,48 +85,53 @@ export function ProductListClient({ products }: { products: ProductItem[] }) {
   }
 
   const cartMap = new Map(cart.map((item) => [item.productId, item.quantity]));
+  const featuredProduct = products[0];
+  const inCartQuantity = featuredProduct ? cartMap.get(featuredProduct._id) ?? 0 : 0;
 
   return (
     <>
-
-      <div id="products" className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {products.map((product) => {
-          const inCartQuantity = cartMap.get(product._id) ?? 0;
-          return (
-            <Card
-              key={product._id}
-              className={`overflow-hidden border-0 bg-white shadow-md shadow-sky-100/60 p-0 ${inCartQuantity > 0 ? "ring-2 ring-sky-500" : ""}`}
-            >
-              <div className="relative h-56 w-full">
-                <Image src={product.image} alt={product.name} fill className="object-cover" />
+      {featuredProduct ? (
+        <div id="products" className="mx-auto ">
+          <Card className={`overflow-hidden border-0 bg-white shadow-lg shadow-sky-100/60 p-0 ${inCartQuantity > 0 ? "ring-2 ring-sky-500" : ""}`}>
+            <div className="flex flex-col lg:flex-row">
+              <div className="relative h-44 lg:h-auto lg:w-1/2">
+                <Image src={featuredProduct.image} alt={featuredProduct.name} fill className="object-cover" />
               </div>
-              <CardHeader>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge className="w-fit rounded-full bg-sky-100 text-sky-700 hover:bg-sky-100">{product.badge}</Badge>
-                  {inCartQuantity > 0 ? (
-                    <Badge className="w-fit rounded-full bg-emerald-100 text-emerald-700">Selected</Badge>
-                  ) : null}
+              <div className="flex flex-col justify-between p-6 lg:w-1/2">
+                <div className="space-y-4">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge className="w-fit rounded-full bg-sky-100 text-sky-700">{featuredProduct.badge}</Badge>
+                    {inCartQuantity > 0 ? (
+                      <Badge className="w-fit rounded-full bg-emerald-100 text-emerald-700">Selected</Badge>
+                    ) : null}
+                  </div>
+                  <div>
+                    <CardTitle className="sm:text-3xl text-xl">{featuredProduct.name}</CardTitle>
+                    <CardDescription className="mt-3 text-zinc-600 sm:line-clamp-4 line-clamp-1">
+                      {featuredProduct.description}
+                    </CardDescription>
+                  </div>
                 </div>
-                <CardTitle className="pt-3 text-xl">{product.name}</CardTitle>
-                <CardDescription>{product.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold text-zinc-900">৳{product.price}</p>
-              </CardContent>
-              <CardFooter>
-                <Button
-                  type="button"
-                  onClick={() => addToCart(product._id)}
-                  className="w-full rounded-xl bg-zinc-900 text-white hover:bg-zinc-800"
-                  variant={inCartQuantity > 0 ? "secondary" : "default"}
-                >
-                  {inCartQuantity > 0 ? `Add More (${inCartQuantity})` : "Add To Cart"}
-                </Button>
-              </CardFooter>
-            </Card>
-          );
-        })}
-      </div>
+                <div className="mt-6 flex flex-col gap-4">
+                  <p className="text-4xl font-black text-zinc-900">৳{featuredProduct.price}</p>
+                  <Button
+                    type="button"
+                    onClick={() => addToCart(featuredProduct._id)}
+                    className="w-full rounded-xl bg-zinc-900 text-white hover:bg-zinc-800"
+                    variant={inCartQuantity > 0 ? "secondary" : "default"}
+                  >
+                    {inCartQuantity > 0 ? `Add More (${inCartQuantity})` : "Add To Cart"}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
+      ) : (
+        <div className="rounded-2xl border bg-white p-8 text-center">
+          <p className="text-zinc-600">No products are available right now.</p>
+        </div>
+      )}
     </>
   );
 }

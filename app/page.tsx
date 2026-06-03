@@ -1,7 +1,5 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+
 import CartSection from "@/components/store/cart-section";
-import ServiceCards from "@/components/store/service-cards";
 import { ProductListClient } from "@/components/store/product-list-client";
 import { seedProducts } from "@/lib/actions/product-actions";
 import { dbConnect } from "@/lib/db";
@@ -42,7 +40,7 @@ export default async function Home() {
           </section>
 
 
-          <section className="mx-auto max-w-7xl px-0 sm:px-2 mt-10">
+          {/* <section className="mx-auto max-w-7xl px-0 sm:px-2 mt-10">
             <div className="mb-8 max-w-3xl space-y-4">
               <p className="text-xl uppercase  text-sky-600">আমাদের বিশেষত্ব</p>
               <h2 className="text-3xl font-black text-zinc-900">কেন আমাদের থেকে কিনবেন?</h2>
@@ -51,7 +49,7 @@ export default async function Home() {
               </p>
             </div>
             <ServiceCards />
-          </section>
+          </section> */}
 
           <section className="mx-auto mt-10 max-w-7xl px-0 sm:px-2">
             <CartSection />

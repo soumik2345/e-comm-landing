@@ -109,7 +109,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           </form>
         </div>
 
-        <div className="rounded-xl border bg-white p-6">
+        {/* <div className="rounded-xl border bg-white p-6">
           <div className="mb-4">
             <h2 className="text-xl font-bold">Service Cards</h2>
             <p className="text-zinc-600">Manage the icon, title and description shown in the service grid.</p>
@@ -118,7 +118,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             <ServiceCardEditor initialCards={serviceCardsWithDefaults} />
             <Button type="submit">Save Service Cards</Button>
           </form>
-        </div>
+        </div> */}
       </section>
     </main>
   );
