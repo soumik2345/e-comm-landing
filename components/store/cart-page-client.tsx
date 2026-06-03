@@ -29,21 +29,29 @@ function readCart() {
   }
 }
 
-function saveCart(items: CartItem[]) {
-  localStorage.setItem(CART_KEY, JSON.stringify(items));
-  window.dispatchEvent(new Event("luma_cart_updated"));
+function persistCart(items: CartItem[]) {
+  if (items.length > 0) {
+    localStorage.setItem(CART_KEY, JSON.stringify(items));
+  } else {
+    localStorage.removeItem(CART_KEY);
+  }
+
+  window.setTimeout(() => {
+    window.dispatchEvent(new Event("luma_cart_updated"));
+  }, 0);
 }
 
 export function CartPageClient({ products }: { products: ProductItem[] }) {
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [hydrated, setHydrated] = useState(false);
+  const [qtyEdits, setQtyEdits] = useState<Record<string, string>>({});
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
     const syncCart = () => setCart(readCart());
     window.addEventListener("luma_cart_updated", syncCart);
     window.addEventListener("storage", syncCart);
     syncCart();
-    setHydrated(true);
+    setIsHydrated(true);
     return () => {
       window.removeEventListener("luma_cart_updated", syncCart);
       window.removeEventListener("storage", syncCart);
@@ -54,32 +62,46 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
   const lines = cart.map((item) => ({ ...item, product: map.get(item.productId) })).filter((i) => i.product);
   const total = lines.reduce((sum, line) => sum + line.product!.price * line.quantity, 0);
 
-  if (!hydrated) {
-    return (
-      <div className="rounded-2xl border bg-white p-8 text-center opacity-80">
-        <p className="text-zinc-500">Loading cart...</p>
-      </div>
-    );
+  function setQty(productId: string, quantity: number) {
+    const nextQty = Math.max(1, Math.min(99, quantity));
+    const nextCart = cart
+      .map((item) => (item.productId === productId ? { ...item, quantity: nextQty } : item))
+      .filter((item) => item.quantity > 0);
+
+    setCart(nextCart);
+    persistCart(nextCart);
+    setQtyEdits((current) => {
+      const next = { ...current };
+      delete next[productId];
+      return next;
+    });
   }
 
-  function setQty(productId: string, quantity: number) {
-    const next = cart
-      .map((item) => (item.productId === productId ? { ...item, quantity: Math.max(1, Math.min(10, quantity)) } : item))
-      .filter((item) => item.quantity > 0);
-    setCart(next);
-    saveCart(next);
+  function updateQtyInput(productId: string, value: string) {
+    setQtyEdits((current) => ({ ...current, [productId]: value }));
+  }
+
+  function commitQtyEdit(productId: string) {
+    const raw = qtyEdits[productId];
+    const parsed = Number(raw);
+    const nextQty = Number.isInteger(parsed) ? Math.max(1, Math.min(99, parsed)) : 1;
+    setQty(productId, nextQty);
+    setQtyEdits((current) => {
+      const next = { ...current };
+      delete next[productId];
+      return next;
+    });
   }
 
   function removeItem(productId: string) {
-    const next = cart.filter((item) => item.productId !== productId);
-    setCart(next);
-    saveCart(next);
+    const nextCart = cart.filter((item) => item.productId !== productId);
+    setCart(nextCart);
+    persistCart(nextCart);
   }
 
   function clearCart() {
     setCart([]);
-    localStorage.removeItem(CART_KEY);
-    window.dispatchEvent(new Event("luma_cart_updated"));
+    persistCart([]);
   }
 
   if (lines.length === 0) {
@@ -115,15 +137,35 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
                   <p className="text-sm text-zinc-600">৳{line.product!.price} each</p>
                 </div>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <Input
-                    type="number"
-                    min={1}
-                    max={10}
-                    value={line.quantity}
-                    onChange={(e) => setQty(line.productId, Number(e.target.value || 1))}
-                    className="w-24"
-                  />
-                  <Button variant="outline" onClick={() => removeItem(line.productId)}>Remove</Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setQty(line.productId, line.quantity - 1)}
+                      disabled={line.quantity <= 1}
+                    >
+                      -
+                    </Button>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={99}
+                      value={qtyEdits[line.productId] ?? line.quantity.toString()}
+                      onChange={(e) => updateQtyInput(line.productId, e.target.value)}
+                      onBlur={() => commitQtyEdit(line.productId)}
+                      onKeyDown={(e) => e.key === "Enter" && commitQtyEdit(line.productId)}
+                      className="w-24 text-center"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setQty(line.productId, line.quantity + 1)}
+                      disabled={line.quantity >= 99}
+                    >
+                      +
+                    </Button>
+                  </div>
+                  <Button type="button" variant="outline" onClick={() => removeItem(line.productId)}>Remove</Button>
                 </div>
               </div>
             </div>

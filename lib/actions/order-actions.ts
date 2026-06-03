@@ -9,7 +9,7 @@ import Product from "@/models/Product";
 
 const cartItemSchema = z.object({
   productId: z.string().min(1),
-  quantity: z.number().int().min(1).max(10),
+  quantity: z.number().int().min(1).max(99),
 });
 
 const placeCartOrderSchema = z.object({

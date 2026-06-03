@@ -74,7 +74,7 @@ export function ProductListClient({ products }: { products: ProductItem[] }) {
     const idx = items.findIndex((i) => i.productId === productId);
 
     if (idx >= 0) {
-      items[idx].quantity = Math.min(10, items[idx].quantity + 1);
+      items[idx].quantity = Math.min(99, items[idx].quantity + 1);
     } else {
       items.push({ productId, quantity: 1 });
     }
