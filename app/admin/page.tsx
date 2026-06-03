@@ -32,7 +32,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
               <Label htmlFor="password">Admin Password</Label>
               <Input id="password" name="password" type="password" required />
             </div>
-            <Button className="w-full">Login</Button>
+            <Button className="w-full" type="submit">Login</Button>
           </form>
         </div>
       </main>
