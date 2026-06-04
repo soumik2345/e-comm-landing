@@ -189,14 +189,9 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
           ))}
         </div>
         <div className="mt-6 rounded-3xl bg-zinc-100 p-4 text-sm text-zinc-700">
-          <p className="font-semibold text-zinc-900">Order summary</p>
-          <div className="mt-3 flex items-center justify-between">
+          <div className="flex items-center justify-between font-semibold text-zinc-900">
             <span>Subtotal</span>
             <span>৳{total}</span>
-          </div>
-          <p className="mt-3 text-xs text-zinc-500">Shipping, taxes and discounts will be calculated at the next step.</p>
-          <div className="mt-4 text-right">
-            <Button variant="secondary" onClick={clearCart}>Clear Cart</Button>
           </div>
         </div>
       </div>
@@ -228,11 +223,11 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
             <Label htmlFor="shippingAddress">Address (ঠিকানা)</Label>
             <Input id="shippingAddress" name="shippingAddress" required className="mt-1 min-h-20" />
           </div>
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <Label htmlFor="note">Note (নোট)</Label>
             <Input id="note" name="note" className="mt-1 min-h-20" />
-          </div>
-          <Button className="w-full rounded-2xl bg-zinc-900 text-white hover:bg-zinc-800" type="submit">Place Cart Order (অর্ডার করুন)</Button>
+          </div> */}
+          <Button className="w-full rounded-2xl bg-green-600 text-white hover:bg-green-500" type="submit">Place Cart Order (অর্ডার করুন)</Button>
         </form>
       </div>
     </div>

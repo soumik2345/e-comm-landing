@@ -92,7 +92,7 @@ export function ProductListClient({ products }: { products: ProductItem[] }) {
     <>
       {featuredProduct ? (
         <div id="products" className="mx-auto ">
-          <Card className={`overflow-hidden border-0 bg-white shadow-lg shadow-sky-100/60 p-0 ${inCartQuantity > 0 ? "ring-2 ring-sky-500" : ""}`}>
+          <Card className={`overflow-hidden border-0 bg-white shadow-lg shadow-sky-100/60 p-0 ${inCartQuantity > 0 ? "ring-2 ring-green-500" : ""}`}>
             <div className="flex flex-col lg:flex-row">
               <div className="relative h-44 lg:h-auto lg:w-1/2">
                 <Image src={featuredProduct.image} alt={featuredProduct.name} fill className="object-cover" />
@@ -117,7 +117,7 @@ export function ProductListClient({ products }: { products: ProductItem[] }) {
                   <Button
                     type="button"
                     onClick={() => addToCart(featuredProduct._id)}
-                    className="w-full rounded-xl bg-zinc-900 text-white hover:bg-zinc-800"
+                    className="w-full rounded-xl bg-green-600 text-white hover:bg-green-500"
                     variant={inCartQuantity > 0 ? "secondary" : "default"}
                   >
                     {inCartQuantity > 0 ? `Add More (${inCartQuantity})` : "Add To Cart"}
