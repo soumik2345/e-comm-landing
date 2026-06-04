@@ -92,9 +92,9 @@ export function ProductListClient({ products }: { products: ProductItem[] }) {
     <>
       {featuredProduct ? (
         <div id="products" className="mx-auto ">
-          <Card className={`overflow-hidden border-0 bg-white shadow-lg shadow-sky-100/60 p-0 ${inCartQuantity > 0 ? "ring-2 ring-green-500" : ""}`}>
+          <Card className={`overflow-hidden h-auto  border-0 bg-white shadow-lg shadow-sky-100/60 p-0 ${inCartQuantity > 0 ? "ring-2 ring-green-500" : ""}`}>
             <div className="flex flex-col lg:flex-row">
-              <div className="relative h-44 lg:h-auto lg:w-1/2">
+              <div className="relative w-full h-50 lg:h-auto lg:w-1/2">
                 <Image src={featuredProduct.image} alt={featuredProduct.name} fill className="object-cover" />
               </div>
               <div className="flex flex-col justify-between p-6 lg:w-1/2">
@@ -114,14 +114,14 @@ export function ProductListClient({ products }: { products: ProductItem[] }) {
                 </div>
                 <div className="mt-6 flex flex-col gap-4">
                   <p className="text-4xl font-black text-zinc-900">৳{featuredProduct.price}</p>
-                  <Button
+                  {/* <Button
                     type="button"
                     onClick={() => addToCart(featuredProduct._id)}
                     className="w-full rounded-xl bg-green-600 text-white hover:bg-green-500"
                     variant={inCartQuantity > 0 ? "secondary" : "default"}
                   >
                     {inCartQuantity > 0 ? `Add More (${inCartQuantity})` : "Add To Cart"}
-                  </Button>
+                  </Button> */}
                 </div>
               </div>
             </div>

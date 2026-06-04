@@ -200,9 +200,9 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
                       {loadingQty[line.productId] ? <span className="animate-spin">⚙️</span> : "+"}
                     </Button>
                   </div>
-                  <Button type="button" variant="outline" onClick={() => removeItem(line.productId)} disabled={loadingRemove[line.productId]}>
+                  {/* <Button type="button" variant="outline" onClick={() => removeItem(line.productId)} disabled={loadingRemove[line.productId]}>
                     {loadingRemove[line.productId] ? <span className="animate-spin">⚙️</span> : "Remove"}
-                  </Button>
+                  </Button> */}
                 </div>
               </div>
             </div>
