@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useTransition, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,9 +43,13 @@ function persistCart(items: CartItem[]) {
 }
 
 export function CartPageClient({ products }: { products: ProductItem[] }) {
+  const [isPending, startTransition] = useTransition();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [qtyEdits, setQtyEdits] = useState<Record<string, string>>({});
   const [isHydrated, setIsHydrated] = useState(false);
+  const [loadingQty, setLoadingQty] = useState<Record<string, boolean>>({});
+  const [loadingRemove, setLoadingRemove] = useState<Record<string, boolean>>({});
+  const [isClearLoading, setIsClearLoading] = useState(false);
 
   useEffect(() => {
     const syncCart = () => setCart(readCart());
@@ -75,6 +80,7 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
   }, [cart, isHydrated, map]);
 
   function setQty(productId: string, quantity: number) {
+    setLoadingQty((prev) => ({ ...prev, [productId]: true }));
     const nextQty = Math.max(1, Math.min(99, quantity));
     const nextCart = cart
       .map((item) => (item.productId === productId ? { ...item, quantity: nextQty } : item))
@@ -87,6 +93,9 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
       delete next[productId];
       return next;
     });
+    setTimeout(() => {
+      setLoadingQty((prev) => ({ ...prev, [productId]: false }));
+    }, 300);
   }
 
   function updateQtyInput(productId: string, value: string) {
@@ -106,14 +115,22 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
   }
 
   function removeItem(productId: string) {
+    setLoadingRemove((prev) => ({ ...prev, [productId]: true }));
     const nextCart = cart.filter((item) => item.productId !== productId);
     setCart(nextCart);
     persistCart(nextCart);
+    setTimeout(() => {
+      setLoadingRemove((prev) => ({ ...prev, [productId]: false }));
+    }, 300);
   }
 
   function clearCart() {
+    setIsClearLoading(true);
     setCart([]);
     persistCart([]);
+    setTimeout(() => {
+      setIsClearLoading(false);
+    }, 300);
   }
 
   if (lines.length === 0) {
@@ -159,9 +176,9 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
                       type="button"
                       variant="outline"
                       onClick={() => setQty(line.productId, line.quantity - 1)}
-                      disabled={line.quantity <= 1}
+                      disabled={line.quantity <= 1 || loadingQty[line.productId]}
                     >
-                      -
+                      {loadingQty[line.productId] ? <span className="animate-spin">⚙️</span> : "-"}
                     </Button>
                     <Input
                       type="number"
@@ -172,17 +189,20 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
                       onBlur={() => commitQtyEdit(line.productId)}
                       onKeyDown={(e) => e.key === "Enter" && commitQtyEdit(line.productId)}
                       className="w-24 text-center"
+                      disabled={loadingQty[line.productId]}
                     />
                     <Button
                       type="button"
                       variant="outline"
                       onClick={() => setQty(line.productId, line.quantity + 1)}
-                      disabled={line.quantity >= 99}
+                      disabled={line.quantity >= 99 || loadingQty[line.productId]}
                     >
-                      +
+                      {loadingQty[line.productId] ? <span className="animate-spin">⚙️</span> : "+"}
                     </Button>
                   </div>
-                  <Button type="button" variant="outline" onClick={() => removeItem(line.productId)}>Remove</Button>
+                  <Button type="button" variant="outline" onClick={() => removeItem(line.productId)} disabled={loadingRemove[line.productId]}>
+                    {loadingRemove[line.productId] ? <span className="animate-spin">⚙️</span> : "Remove"}
+                  </Button>
                 </div>
               </div>
             </div>
@@ -193,6 +213,16 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
             <span>Subtotal</span>
             <span>৳{total}</span>
           </div>
+          {/* <div className="mt-4 text-right">
+            <Button 
+              variant="secondary" 
+              onClick={() => clearCart()} 
+              disabled={isClearLoading}
+              type="button"
+            >
+              {isClearLoading ? <span className="animate-spin">⚙️</span> : "Clear Cart"}
+            </Button>
+          </div> */}
         </div>
       </div>
 
@@ -202,9 +232,25 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
           <p className="text-sm text-zinc-500">Fill in your details to place the order.</p>
         </div>
         <form
-          action={placeCartOrder}
-          onSubmit={() => {
+          onSubmit={(e) => {
+            e.preventDefault();
+            const formData = new FormData(e.currentTarget);
             localStorage.setItem(CART_KEY, JSON.stringify(cart));
+            
+            const toastId = toast.loading("Processing your order...");
+            
+            startTransition(async () => {
+              try {
+                await placeCartOrder(formData);
+                toast.dismiss(toastId);
+                toast.success("Order placed successfully!");
+                setCart([]);
+                persistCart([]);
+              } catch (error) {
+                toast.dismiss(toastId);
+                toast.error(error instanceof Error ? error.message : "Failed to place order");
+              }
+            });
           }}
           className="grid gap-4"
         >
@@ -227,7 +273,13 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
             <Label htmlFor="note">Note (নোট)</Label>
             <Input id="note" name="note" className="mt-1 min-h-20" />
           </div> */}
-          <Button className="w-full rounded-2xl bg-green-600 text-white hover:bg-green-500" type="submit">Place Cart Order (অর্ডার করুন)</Button>
+          <Button 
+            className="w-full rounded-2xl bg-green-600 text-white hover:bg-green-500" 
+            type="submit"
+            disabled={isPending}
+          >
+            {isPending ? <span className="animate-spin">⚙️</span> : "Place Cart Order (অর্ডার করুন)"}
+          </Button>
         </form>
       </div>
     </div>

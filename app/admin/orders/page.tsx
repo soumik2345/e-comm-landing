@@ -81,7 +81,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
                   <Badge className={statusColor(order.status)}>{order.status}</Badge>
                 </div>
 
-                <div className="grid gap-4 text-sm md:grid-cols-4">
+                <div className="grid gap-4 text-sm md:grid-cols-5">
                   <div>
                     <p className="mb-2 text-zinc-500">Items</p>
                     <div className="space-y-1">
@@ -113,6 +113,10 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
                   <div>
                     <p className="text-zinc-500">Tracking</p>
                     <p className="font-medium">{order.trackingCode || "Not assigned"}</p>
+                  </div>
+                  <div>
+                    <p className="text-zinc-500">Address</p>
+                    <p className="text-sm">{order.shippingAddress}</p>
                   </div>
                 </div>
 

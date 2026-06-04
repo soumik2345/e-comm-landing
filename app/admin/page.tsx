@@ -57,7 +57,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           <h1 className="text-3xl font-black">Admin Dashboard</h1>
           <div className="flex flex-wrap gap-2">
             <Link href="/"><Button variant="outline">Store</Button></Link>
-            <form action={adminLogout}><Button variant="secondary">Logout</Button></form>
+            <form action={adminLogout}><Button variant="secondary" type="submit">Logout</Button></form>
           </div>
         </div>
 

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope, Space_Grotesk } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
 import FloatingContactButtons from "@/components/ui/floating-contact-buttons";
 
@@ -31,6 +32,7 @@ export default async function RootLayout({
         {children}
 
         <FloatingContactButtons />
+        <Toaster />
       </body>
     </html>
   );
