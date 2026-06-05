@@ -16,7 +16,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Luma Store",
+  title: "NexMall",
   description: "Modern product landing page with admin panel",
 };
 
