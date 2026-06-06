@@ -1,4 +1,3 @@
-
 import CartSection from "@/components/store/cart-section";
 import { ProductListClient } from "@/components/store/product-list-client";
 import { seedProducts } from "@/lib/actions/product-actions";
@@ -31,16 +30,13 @@ export default async function Home() {
 
   return (
     <>
-           <HeaderBanner />
-        <main className="min-h-screen bg-[radial-gradient(circle_at_top_right,#ecf6ff_10%,#f9fbff_40%,#ffffff_70%)] px-4 py-8 sm:px-6 lg:px-8">
+      <HeaderBanner />
+      <main className="min-h-dvh bg-[radial-gradient(circle_at_top_right,#ecf6ff_10%,#f9fbff_40%,#ffffff_70%)] px-4 py-8 sm:px-6 lg:px-8">
+        <section className="mx-auto mt-10 max-w-7xl px-0 sm:px-2">
+          <ProductListClient products={products} />
+        </section>
 
-
-          <section className="mx-auto mt-10 max-w-7xl px-0 sm:px-2">
-            <ProductListClient products={products} />
-          </section>
-
-
-          {/* <section className="mx-auto max-w-7xl px-0 sm:px-2 mt-10">
+        {/* <section className="mx-auto max-w-7xl px-0 sm:px-2 mt-10">
             <div className="mb-8 max-w-3xl space-y-4">
               <p className="text-xl uppercase  text-sky-600">আমাদের বিশেষত্ব</p>
               <h2 className="text-3xl font-black text-zinc-900">কেন আমাদের থেকে কিনবেন?</h2>
@@ -51,11 +47,10 @@ export default async function Home() {
             <ServiceCards />
           </section> */}
 
-          <section className="mx-auto mt-10 max-w-7xl px-0 sm:px-2">
-            <CartSection />
-          </section>
-        </main>
+        <section className="mx-auto mt-10 max-w-7xl px-0 sm:px-2">
+          <CartSection />
+        </section>
+      </main>
     </>
-
   );
 }
