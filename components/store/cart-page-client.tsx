@@ -48,7 +48,9 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
   const [qtyEdits, setQtyEdits] = useState<Record<string, string>>({});
   const [isHydrated, setIsHydrated] = useState(false);
   const [loadingQty, setLoadingQty] = useState<Record<string, boolean>>({});
-  const [loadingRemove, setLoadingRemove] = useState<Record<string, boolean>>({});
+  const [loadingRemove, setLoadingRemove] = useState<Record<string, boolean>>(
+    {},
+  );
   const [isClearLoading, setIsClearLoading] = useState(false);
 
   useEffect(() => {
@@ -63,9 +65,17 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
     };
   }, []);
 
-  const map = useMemo(() => new Map(products.map((p) => [p._id, p])), [products]);
-  const lines = cart.map((item) => ({ ...item, product: map.get(item.productId) })).filter((i) => i.product);
-  const total = lines.reduce((sum, line) => sum + line.product!.price * line.quantity, 0);
+  const map = useMemo(
+    () => new Map(products.map((p) => [p._id, p])),
+    [products],
+  );
+  const lines = cart
+    .map((item) => ({ ...item, product: map.get(item.productId) }))
+    .filter((i) => i.product);
+  const total = lines.reduce(
+    (sum, line) => sum + line.product!.price * line.quantity,
+    0,
+  );
   const [cleanupMessage, setCleanupMessage] = useState("");
 
   useEffect(() => {
@@ -83,7 +93,9 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
     setLoadingQty((prev) => ({ ...prev, [productId]: true }));
     const nextQty = Math.max(1, Math.min(99, quantity));
     const nextCart = cart
-      .map((item) => (item.productId === productId ? { ...item, quantity: nextQty } : item))
+      .map((item) =>
+        item.productId === productId ? { ...item, quantity: nextQty } : item,
+      )
       .filter((item) => item.quantity > 0);
 
     setCart(nextCart);
@@ -105,7 +117,9 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
   function commitQtyEdit(productId: string) {
     const raw = qtyEdits[productId];
     const parsed = Number(raw);
-    const nextQty = Number.isInteger(parsed) ? Math.max(1, Math.min(99, parsed)) : 1;
+    const nextQty = Number.isInteger(parsed)
+      ? Math.max(1, Math.min(99, parsed))
+      : 1;
     setQty(productId, nextQty);
     setQtyEdits((current) => {
       const next = { ...current };
@@ -124,6 +138,14 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
     }, 300);
   }
 
+  const scrollIntoView = (e: React.FocusEvent<HTMLInputElement>) => {
+    setTimeout(() => {
+      e.target.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }, 300);
+  };
   function clearCart() {
     setIsClearLoading(true);
     setCart([]);
@@ -150,9 +172,13 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
         <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-xl font-bold">Cart Items</h2>
-            <p className="text-sm text-zinc-500">Review or edit products before checkout.</p>
+            <p className="text-sm text-zinc-500">
+              Review or edit products before checkout.
+            </p>
           </div>
-          <div className="rounded-full bg-zinc-100 px-3 py-1 text-sm text-zinc-700">{lines.length} item{lines.length === 1 ? "" : "s"}</div>
+          <div className="rounded-full bg-zinc-100 px-3 py-1 text-sm text-zinc-700">
+            {lines.length} item{lines.length === 1 ? "" : "s"}
+          </div>
         </div>
         {cleanupMessage ? (
           <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
@@ -161,14 +187,23 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
         ) : null}
         <div className="space-y-4">
           {lines.map((line) => (
-            <div key={line.productId} className="rounded-3xl border border-zinc-200 bg-zinc-50 p-4">
+            <div
+              key={line.productId}
+              className="rounded-3xl border border-zinc-200 bg-zinc-50 p-4"
+            >
               <div className="mb-3 flex items-center gap-2">
-                <Badge className="w-fit rounded-full bg-emerald-100 text-emerald-700">Selected</Badge>
+                <Badge className="w-fit rounded-full bg-emerald-100 text-emerald-700">
+                  Selected
+                </Badge>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="font-semibold text-zinc-900">{line.product!.name}</p>
-                  <p className="text-sm text-zinc-600">৳{line.product!.price} each</p>
+                  <p className="font-semibold text-zinc-900">
+                    {line.product!.name}
+                  </p>
+                  <p className="text-sm text-zinc-600">
+                    ৳{line.product!.price} each
+                  </p>
                 </div>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                   <div className="flex items-center gap-2">
@@ -176,18 +211,30 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
                       type="button"
                       variant="outline"
                       onClick={() => setQty(line.productId, line.quantity - 1)}
-                      disabled={line.quantity <= 1 || loadingQty[line.productId]}
+                      disabled={
+                        line.quantity <= 1 || loadingQty[line.productId]
+                      }
                     >
-                      {loadingQty[line.productId] ? <span className="animate-spin">⚙️</span> : "-"}
+                      {loadingQty[line.productId] ? (
+                        <span className="animate-spin">⚙️</span>
+                      ) : (
+                        "-"
+                      )}
                     </Button>
                     <Input
                       type="number"
                       min={1}
                       max={99}
-                      value={qtyEdits[line.productId] ?? line.quantity.toString()}
-                      onChange={(e) => updateQtyInput(line.productId, e.target.value)}
+                      value={
+                        qtyEdits[line.productId] ?? line.quantity.toString()
+                      }
+                      onChange={(e) =>
+                        updateQtyInput(line.productId, e.target.value)
+                      }
                       onBlur={() => commitQtyEdit(line.productId)}
-                      onKeyDown={(e) => e.key === "Enter" && commitQtyEdit(line.productId)}
+                      onKeyDown={(e) =>
+                        e.key === "Enter" && commitQtyEdit(line.productId)
+                      }
                       className="w-24 text-center"
                       disabled={loadingQty[line.productId]}
                     />
@@ -195,9 +242,15 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
                       type="button"
                       variant="outline"
                       onClick={() => setQty(line.productId, line.quantity + 1)}
-                      disabled={line.quantity >= 99 || loadingQty[line.productId]}
+                      disabled={
+                        line.quantity >= 99 || loadingQty[line.productId]
+                      }
                     >
-                      {loadingQty[line.productId] ? <span className="animate-spin">⚙️</span> : "+"}
+                      {loadingQty[line.productId] ? (
+                        <span className="animate-spin">⚙️</span>
+                      ) : (
+                        "+"
+                      )}
                     </Button>
                   </div>
                   {/* <Button type="button" variant="outline" onClick={() => removeItem(line.productId)} disabled={loadingRemove[line.productId]}>
@@ -214,9 +267,9 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
             <span>৳{total}</span>
           </div>
           {/* <div className="mt-4 text-right">
-            <Button 
-              variant="secondary" 
-              onClick={() => clearCart()} 
+            <Button
+              variant="secondary"
+              onClick={() => clearCart()}
               disabled={isClearLoading}
               type="button"
             >
@@ -229,16 +282,18 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
       <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
         <div className="mb-5">
           <h2 className="text-xl font-bold">Checkout (চেকআউট)</h2>
-          <p className="text-sm text-zinc-500">Fill in your details to place the order.</p>
+          <p className="text-sm text-zinc-500">
+            Fill in your details to place the order.
+          </p>
         </div>
         <form
           onSubmit={(e) => {
             e.preventDefault();
             const formData = new FormData(e.currentTarget);
             localStorage.setItem(CART_KEY, JSON.stringify(cart));
-            
+
             const toastId = toast.loading("Processing your order...");
-            
+
             startTransition(async () => {
               try {
                 await placeCartOrder(formData);
@@ -248,37 +303,67 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
                 persistCart([]);
               } catch (error) {
                 toast.dismiss(toastId);
-                toast.error(error instanceof Error ? error.message : "Failed to place order");
+                toast.error(
+                  error instanceof Error
+                    ? error.message
+                    : "Failed to place order",
+                );
               }
             });
           }}
           className="grid gap-4"
         >
-          <input type="hidden" name="cartPayload" value={JSON.stringify(cart)} />
+          <input
+            type="hidden"
+            name="cartPayload"
+            value={JSON.stringify(cart)}
+          />
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="customerName">Name (নাম)</Label>
-              <Input id="customerName" name="customerName" required className="mt-1" />
+              <Input
+                id="customerName"
+                name="customerName"
+                required
+                className="mt-1"
+                onFocus={scrollIntoView}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="customerPhone">Phone (ফোন)</Label>
-              <Input id="customerPhone" name="customerPhone" required className="mt-1" />
+              <Input
+                id="customerPhone"
+                name="customerPhone"
+                required
+                className="mt-1"
+                onFocus={scrollIntoView}
+              />
             </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="shippingAddress">Address (ঠিকানা)</Label>
-            <Input id="shippingAddress" name="shippingAddress" required className="mt-1 min-h-20" />
+            <Input
+              id="shippingAddress"
+              name="shippingAddress"
+              required
+              className="mt-1 min-h-20"
+              onFocus={scrollIntoView}
+            />
           </div>
           {/* <div className="space-y-2">
             <Label htmlFor="note">Note (নোট)</Label>
             <Input id="note" name="note" className="mt-1 min-h-20" />
           </div> */}
-          <Button 
-            className="w-full rounded-2xl bg-green-600 text-white hover:bg-green-500" 
+          <Button
+            className="w-full rounded-2xl bg-green-600 text-white hover:bg-green-500"
             type="submit"
             disabled={isPending}
           >
-            {isPending ? <span className="animate-spin">⚙️</span> : "Place Cart Order (অর্ডার করুন)"}
+            {isPending ? (
+              <span className="animate-spin">⚙️</span>
+            ) : (
+              "Place Cart Order (অর্ডার করুন)"
+            )}
           </Button>
         </form>
       </div>

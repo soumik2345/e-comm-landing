@@ -4,7 +4,6 @@ import { Toaster } from "sonner";
 import "./globals.css";
 import FloatingContactButtons from "@/components/ui/floating-contact-buttons";
 
-
 const manrope = Manrope({
   variable: "--font-manrope",
   subsets: ["latin"],
@@ -14,6 +13,11 @@ const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
   subsets: ["latin"],
 });
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 export const metadata: Metadata = {
   title: "NexMall",
@@ -26,9 +30,11 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${manrope.variable} ${spaceGrotesk.variable} h-full`}>
+    <html
+      lang="en"
+      className={`${manrope.variable} ${spaceGrotesk.variable} h-full`}
+    >
       <body className="min-h-full bg-background text-foreground">
-       
         {children}
 
         <FloatingContactButtons />
