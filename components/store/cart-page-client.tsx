@@ -143,8 +143,9 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
       e.target.scrollIntoView({
         behavior: "smooth",
         block: "center",
+        inline: "nearest",
       });
-    }, 300);
+    }, 100);
   };
   function clearCart() {
     setIsClearLoading(true);
