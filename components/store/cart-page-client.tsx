@@ -292,7 +292,7 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
           </div> */}
         </div>
       </div>
-      <div className="pb-80">
+      <div className="sm:pb-0 pb-80">
         <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
           <div className="mb-5">
             <h2 className="text-xl font-bold">Checkout (চেকআউট)</h2>
