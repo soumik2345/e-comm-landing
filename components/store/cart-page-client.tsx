@@ -110,10 +110,31 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
     }, 300);
   }
 
-  function updateQtyInput(productId: string, value: string) {
-    setQtyEdits((current) => ({ ...current, [productId]: value }));
-  }
+  // function updateQtyInput(productId: string, value: string) {
+  //   setQtyEdits((current) => ({ ...current, [productId]: value }));
+  //   // setQty(productId, Number(value));
+  // }
 
+  function updateQtyInput(productId: string, value: string) {
+    // 1. Always update the input's string value so the user can type freely (even delete numbers)
+    setQtyEdits((current) => ({ ...current, [productId]: value }));
+
+    // 2. Parse the string value to check if it's a valid integer
+    const parsed = parseInt(value, 10);
+
+    if (!isNaN(parsed)) {
+      // 3. Constrain the value between 1 and 99
+      const nextQty = Math.max(1, Math.min(99, parsed));
+
+      // 4. Update the cart state immediately so the subtotal changes in real-time
+      const nextCart = cart.map((item) =>
+        item.productId === productId ? { ...item, quantity: nextQty } : item,
+      );
+
+      setCart(nextCart);
+      persistCart(nextCart);
+    }
+  }
   function commitQtyEdit(productId: string) {
     const raw = qtyEdits[productId];
     const parsed = Number(raw);
@@ -242,9 +263,10 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
                       value={
                         qtyEdits[line.productId] ?? line.quantity.toString()
                       }
-                      onChange={(e) =>
-                        updateQtyInput(line.productId, e.target.value)
-                      }
+                      onChange={(e) => {
+                        updateQtyInput(line.productId, e.target.value);
+                        // setQty(line.productId, e.target.value);
+                      }}
                       onBlur={() => commitQtyEdit(line.productId)}
                       onKeyDown={(e) =>
                         e.key === "Enter" && commitQtyEdit(line.productId)

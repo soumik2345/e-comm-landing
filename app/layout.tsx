@@ -60,6 +60,9 @@ export default async function RootLayout({
 
             fbq('init', '1304522458454872');
             fbq('track', 'PageView');
+            fbq('track', 'Purchase', {
+              currency: 'bdt',
+            });
           `}
         </Script>
 
