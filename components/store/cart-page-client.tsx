@@ -292,94 +292,96 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
           </div> */}
         </div>
       </div>
-
-      <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
-        <div className="mb-5">
-          <h2 className="text-xl font-bold">Checkout (চেকআউট)</h2>
-          <p className="text-sm text-zinc-500">
-            Fill in your details to place the order.
-          </p>
-        </div>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            const formData = new FormData(e.currentTarget);
-            localStorage.setItem(CART_KEY, JSON.stringify(cart));
-
-            const toastId = toast.loading("Processing your order...");
-
-            startTransition(async () => {
-              try {
-                await placeCartOrder(formData);
-                toast.dismiss(toastId);
-                toast.success("Order placed successfully!");
-                setCart([]);
-                persistCart([]);
-              } catch (error) {
-                toast.dismiss(toastId);
-                toast.error(
-                  error instanceof Error
-                    ? error.message
-                    : "Failed to place order",
-                );
-              }
-            });
-          }}
-          className="grid gap-4"
-        >
-          <input
-            type="hidden"
-            name="cartPayload"
-            value={JSON.stringify(cart)}
-          />
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="customerName">Name (নাম)</Label>
-              <Input
-                id="customerName"
-                name="customerName"
-                required
-                className="mt-1"
-                onFocus={scrollIntoView}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="customerPhone">Phone (ফোন)</Label>
-              <Input
-                id="customerPhone"
-                name="customerPhone"
-                required
-                className="mt-1"
-                onFocus={scrollIntoView}
-              />
-            </div>
+      <div className="pb-80">
+        <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <div className="mb-5">
+            <h2 className="text-xl font-bold">Checkout (চেকআউট)</h2>
+            <p className="text-sm text-zinc-500">
+              Fill in your details to place the order.
+            </p>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="shippingAddress">Address (ঠিকানা)</Label>
-            <Input
-              id="shippingAddress"
-              name="shippingAddress"
-              required
-              className="mt-1 min-h-20"
-              onFocus={scrollIntoView}
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              localStorage.setItem(CART_KEY, JSON.stringify(cart));
+
+              const toastId = toast.loading("Processing your order...");
+
+              startTransition(async () => {
+                try {
+                  await placeCartOrder(formData);
+                  toast.dismiss(toastId);
+                  toast.success("Order placed successfully!");
+                  setCart([]);
+                  persistCart([]);
+                } catch (error) {
+                  toast.dismiss(toastId);
+                  toast.error(
+                    error instanceof Error
+                      ? error.message
+                      : "Failed to place order",
+                  );
+                }
+              });
+            }}
+            className="grid gap-4"
+          >
+            <input
+              type="hidden"
+              name="cartPayload"
+              value={JSON.stringify(cart)}
             />
-          </div>
-          {/* <div className="space-y-2">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="customerName">Name (নাম)</Label>
+                <Input
+                  id="customerName"
+                  name="customerName"
+                  required
+                  className="mt-1"
+                  onFocus={scrollIntoView}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="customerPhone">Phone (ফোন)</Label>
+                <Input
+                  id="customerPhone"
+                  name="customerPhone"
+                  required
+                  className="mt-1"
+                  onFocus={scrollIntoView}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="shippingAddress">Address (ঠিকানা)</Label>
+              <Input
+                id="shippingAddress"
+                name="shippingAddress"
+                required
+                className="mt-1 min-h-20"
+                onFocus={scrollIntoView}
+              />
+            </div>
+            {/* <div className="space-y-2">
             <Label htmlFor="note">Note (নোট)</Label>
             <Input id="note" name="note" className="mt-1 min-h-20" />
           </div> */}
-          <Button
-            className="w-full rounded-2xl bg-green-600 text-white hover:bg-green-500"
-            type="submit"
-            disabled={isPending}
-          >
-            {isPending ? (
-              <span className="animate-spin">⚙️</span>
-            ) : (
-              "Place Cart Order (অর্ডার করুন)"
-            )}
-          </Button>
-        </form>
+            <Button
+              className="w-full rounded-2xl bg-green-600 text-white hover:bg-green-500"
+              type="submit"
+              disabled={isPending}
+            >
+              {isPending ? (
+                <span className="animate-spin">⚙️</span>
+              ) : (
+                "Place Cart Order (অর্ডার করুন)"
+              )}
+            </Button>
+          </form>
+        </div>
       </div>
     </div>
   );
