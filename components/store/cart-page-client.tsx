@@ -141,28 +141,25 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
   const scrollIntoView = (e: React.FocusEvent<HTMLInputElement>) => {
     const target = e.target;
 
-    // Give the browser a moment to start triggering the soft keyboard layout transition
     setTimeout(() => {
-      // 1. Force the element to align to the top of the visible screen space
       target.scrollIntoView({
         behavior: "smooth",
-        block: "start", // This pulls the active field high up, away from the keyboard
+        block: "start",
       });
 
-      // 2. Facebook/Instagram Webview Safetynet using the Visual Viewport API
+      // Added optional chaining here: window.visualViewport?.height
       if (window.visualViewport) {
         setTimeout(() => {
           const rect = target.getBoundingClientRect();
-          // If the bottom of your input is intersecting or below the actual viewable height
-          if (rect.bottom > window.visualViewport.height) {
-            // Force a secondary tight scroll adjustment
+
+          // Safe check using optional chaining
+          if (rect.bottom > (window.visualViewport?.height ?? 0)) {
             target.scrollIntoView({ behavior: "smooth", block: "center" });
           }
-        }, 250); // Small extra delay to capture sluggish webview layout calculations
+        }, 250);
       }
     }, 200);
   };
-
   function clearCart() {
     setIsClearLoading(true);
     setCart([]);
