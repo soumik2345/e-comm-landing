@@ -96,3 +96,17 @@
     font-family: var(--font-space-grotesk), sans-serif;
   }
 }
+
+/* Ensure the document can freely shift upwards when keyboards overlay */
+html,
+body {
+  height: auto;
+  min-height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* Forces fluid momentum scrolling in iOS environments */
+}
+
+/* Add a safety margin at the bottom of your form container if needed */
+form {
+  padding-bottom: 120px; /* Gives extra blank track space so fields can be pushed high up */
+}
