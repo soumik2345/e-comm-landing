@@ -139,21 +139,30 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
   }
 
   const scrollIntoView = (e: React.FocusEvent<HTMLInputElement>) => {
-    // setTimeout(() => {
-    //   e.target.scrollIntoView({
-    //     behavior: "smooth",
-    //     block: "center",
-    //     inline: "nearest",
-    //   });
-    // }, 100);
-    setTimeout(() => {
-      const y = e.target.getBoundingClientRect().top + window.pageYOffset - 150;
+    const target = e.target;
 
-      window.scrollTo({
-        top: y,
+    // 1. First, use a small delay to allow the keyboard to begin opening
+    setTimeout(() => {
+      // 2. Try native smooth block scrolling centered
+      target.scrollIntoView({
         behavior: "smooth",
+        block: "center",
       });
-    }, 600);
+
+      // 3. Specifically for Facebook/iOS webviews: adjust scroll if the layout is trapped
+      if (window.visualViewport) {
+        setTimeout(() => {
+          const inputRect = target.getBoundingClientRect();
+          // If the input is still hidden or too low down near the keyboard
+          if (inputRect.bottom > window.visualViewport.height) {
+            target.scrollIntoView({
+              behavior: "smooth",
+              block: "nearest",
+            });
+          }
+        }, 300); // Additional delay for slow webview viewport updates
+      }
+    }, 300);
   };
   function clearCart() {
     setIsClearLoading(true);
