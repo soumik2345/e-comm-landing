@@ -139,13 +139,21 @@ export function CartPageClient({ products }: { products: ProductItem[] }) {
   }
 
   const scrollIntoView = (e: React.FocusEvent<HTMLInputElement>) => {
+    // setTimeout(() => {
+    //   e.target.scrollIntoView({
+    //     behavior: "smooth",
+    //     block: "center",
+    //     inline: "nearest",
+    //   });
+    // }, 100);
     setTimeout(() => {
-      e.target.scrollIntoView({
+      const y = e.target.getBoundingClientRect().top + window.pageYOffset - 150;
+
+      window.scrollTo({
+        top: y,
         behavior: "smooth",
-        block: "center",
-        inline: "nearest",
       });
-    }, 100);
+    }, 600);
   };
   function clearCart() {
     setIsClearLoading(true);
